@@ -14,23 +14,24 @@ pipeline{
 
     stage("Clone repo"){
       steps{
-        sh "git clone https://github.com/alahammami2/tp2jenkins.git"
+        sh "git clone https://github.com/alahammami2/front-sonar.git"
       }
     }
 
-    stage("Generate image"){
+    stage("Build"){
       steps{
-        dir("tp2jenkins"){
+        dir("front-sonar"){
           sh "mvn clean install"
-          sh "docker build -t tp2jenk ."
         }
       }
     }   
 
-    stage("Run docker compose"){
+    stage("SonarQube Analysis"){
       steps{
-        dir("tp2jenkins"){
-          sh "docker-compose up -d"
+        withSonarQubeEnv("sonar-server"){
+          dir ("front-sonar"){
+            sh 'mvn sonar:sonar'
+        }
         }
       }
     } 
